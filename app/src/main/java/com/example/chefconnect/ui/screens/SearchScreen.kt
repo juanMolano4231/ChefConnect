@@ -10,6 +10,8 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import androidx.navigation.NavController
 import com.example.chefconnect.ui.viewmodel.*
+import androidx.compose.foundation.clickable
+import com.example.chefconnect.ui.navigation.Screen
 
 @Composable
 fun SearchScreen(viewModel: MealViewModel, nav: NavController) {
@@ -36,15 +38,23 @@ fun SearchScreen(viewModel: MealViewModel, nav: NavController) {
                 val meals = (state as MealState.SuccessMeals).meals
 
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                    items(meals) {
-                        Card(modifier = Modifier.padding(8.dp)) {
+                    items(meals) { meal ->
+                        Card(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    nav.navigate(
+                                        Screen.Detail.createRoute(meal.idMeal)
+                                    )
+                                }
+                        ) {
                             Column {
                                 AsyncImage(
-                                    model = it.strMealThumb,
+                                    model = meal.strMealThumb,
                                     contentDescription = null,
                                     modifier = Modifier.height(120.dp)
                                 )
-                                Text(it.strMeal)
+                                Text(meal.strMeal)
                             }
                         }
                     }
