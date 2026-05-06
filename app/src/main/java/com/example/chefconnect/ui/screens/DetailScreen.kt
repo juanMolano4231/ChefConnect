@@ -10,6 +10,8 @@ import coil.compose.AsyncImage
 import com.example.chefconnect.data.local.FavoritesManager
 import com.example.chefconnect.ui.viewmodel.MealViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import com.example.chefconnect.notifications.NotificationHelper
 
 @Composable
 fun DetailScreen(
@@ -20,6 +22,8 @@ fun DetailScreen(
 
     val scope = rememberCoroutineScope()
     val meal by viewModel.detailState.collectAsState()
+    val context = LocalContext.current
+    val notifier = remember { NotificationHelper(context) }
 
     LaunchedEffect(id) {
         viewModel.loadDetail(id)
@@ -58,6 +62,11 @@ fun DetailScreen(
         Button(onClick = {
             scope.launch {
                 favoritesManager.toggleFavorite(id)
+
+                notifier.showFavoriteNotification(
+                    meal!!.idMeal,
+                    meal!!.strMeal
+                )
             }
         }) {
             Text("Toggle Favorite")

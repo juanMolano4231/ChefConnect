@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.padding
 import androidx.navigation.compose.*
+import androidx.navigation.navDeepLink
 import com.example.chefconnect.data.local.FavoritesManager
 import com.example.chefconnect.ui.components.BottomBar
 import com.example.chefconnect.ui.screens.*
@@ -44,7 +45,14 @@ fun AppNavHost(
                 MealsScreen(viewModel, category, navController)
             }
 
-            composable(Screen.Detail.route) {
+            composable(
+                route = Screen.Detail.route,
+                deepLinks = listOf(
+                    navDeepLink {
+                        uriPattern = "chefconnect://details/{id}"
+                    }
+                )
+            ) {
                 val id = it.arguments?.getString("id") ?: ""
                 DetailScreen(id, viewModel, favoritesManager)
             }
