@@ -65,7 +65,8 @@ fun DetailScreen(
 
                 notifier.showFavoriteNotification(
                     meal!!.idMeal,
-                    meal!!.strMeal
+                    meal!!.strMeal,
+                    meal!!.strMealThumb
                 )
             }
         }) {
