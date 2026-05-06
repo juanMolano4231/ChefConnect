@@ -8,6 +8,7 @@ import com.example.chefconnect.data.repository.MealRepository
 import com.example.chefconnect.ui.navigation.AppNavHost
 import com.example.chefconnect.ui.theme.ChefTheme
 import com.example.chefconnect.ui.viewmodel.MealViewModel
+import com.example.chefconnect.data.local.FavoritesManager
 
 class MainActivity : ComponentActivity() {
 
@@ -17,9 +18,11 @@ class MainActivity : ComponentActivity() {
         val repository = MealRepository(RetrofitClient.api)
         val viewModel = MealViewModel(repository)
 
+        val favoritesManager = FavoritesManager(this)
+
         setContent {
             ChefTheme {
-                AppNavHost(viewModel)
+                AppNavHost(viewModel, favoritesManager)
             }
         }
     }

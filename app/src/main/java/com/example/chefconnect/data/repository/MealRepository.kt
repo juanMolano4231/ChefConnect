@@ -11,5 +11,9 @@ class MealRepository(
     suspend fun getMeals(category: String) =
         api.getMealsByCategory(category)
 
+    suspend fun searchMeals(query: String) =
+        api.searchMeals(query)
 
+    suspend fun getMealDetail(id: String) =
+        api.getMealDetail(id)
 }

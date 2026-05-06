@@ -2,17 +2,65 @@ package com.example.chefconnect.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import com.example.chefconnect.data.local.FavoritesManager
+import com.example.chefconnect.ui.viewmodel.MealViewModel
+import kotlinx.coroutines.launch
 
 @Composable
-fun DetailScreen(id: String) {
+fun DetailScreen(
+    id: String,
+    viewModel: MealViewModel,
+    favoritesManager: FavoritesManager
+) {
 
-    Box(
+    val scope = rememberCoroutineScope()
+    val meal by viewModel.detailState.collectAsState()
+
+    LaunchedEffect(id) {
+        viewModel.loadDetail(id)
+    }
+
+    if (meal == null) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    Column(
         Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Meal ID: $id")
+
+        AsyncImage(
+            model = meal!!.strMealThumb,
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+        )
+
+        Text(
+            text = "ID: ${meal!!.idMeal}",
+            style = MaterialTheme.typography.titleMedium
+        )
+
+        Text(
+            text = meal!!.strMeal,
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        Button(onClick = {
+            scope.launch {
+                favoritesManager.toggleFavorite(id)
+            }
+        }) {
+            Text("Toggle Favorite")
+        }
     }
 }

@@ -2,10 +2,16 @@ package com.example.chefconnect.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.*
+import com.example.chefconnect.data.local.FavoritesManager
 import com.example.chefconnect.ui.screens.*
+import com.example.chefconnect.ui.viewmodel.MealViewModel
 
 @Composable
-fun AppNavHost(viewModel: com.example.chefconnect.ui.viewmodel.MealViewModel) {
+fun AppNavHost(
+    viewModel: MealViewModel,
+    favoritesManager: FavoritesManager
+)
+{
 
     val navController = rememberNavController()
 
@@ -22,7 +28,17 @@ fun AppNavHost(viewModel: com.example.chefconnect.ui.viewmodel.MealViewModel) {
 
         composable(Screen.Detail.route) {
             val id = it.arguments?.getString("id") ?: ""
-            DetailScreen(id)
+            DetailScreen(id, viewModel, favoritesManager)
         }
+
+        composable("search") {
+            SearchScreen(viewModel, navController)
+        }
+
+        composable("favorites") {
+            FavoritesScreen(viewModel)
+        }
+
+
     }
 }

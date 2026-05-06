@@ -19,3 +19,13 @@ data class Category(
     val strCategory: String,
     val strCategoryThumb: String
 )
+
+data class MealDetailResponse(
+    val meals: List<MealDetail>
+)
+
+data class MealDetail(
+    val idMeal: String,
+    val strMeal: String,
+    val strMealThumb: String
+)

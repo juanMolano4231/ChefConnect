@@ -14,4 +14,13 @@ interface MealApiService {
         @Query("c") category: String
     ): MealResponse
 
+    @GET("search.php")
+    suspend fun searchMeals(
+        @Query("s") query: String
+    ): MealResponse
+
+    @GET("lookup.php")
+    suspend fun getMealDetail(
+        @Query("i") id: String
+    ): MealDetailResponse
 }
