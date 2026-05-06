@@ -25,6 +25,10 @@ fun DetailScreen(
     val context = LocalContext.current
     val notifier = remember { NotificationHelper(context) }
 
+    // observar favoritos
+    val favorites by favoritesManager.favoritesFlow.collectAsState(initial = emptySet())
+    val isFavorite = favorites.contains(id)
+
     LaunchedEffect(id) {
         viewModel.loadDetail(id)
     }
@@ -59,18 +63,39 @@ fun DetailScreen(
             style = MaterialTheme.typography.titleLarge
         )
 
-        Button(onClick = {
-            scope.launch {
-                favoritesManager.toggleFavorite(id)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
 
-                notifier.showFavoriteNotification(
-                    meal!!.idMeal,
-                    meal!!.strMeal,
-                    meal!!.strMealThumb
-                )
-            }
-        }) {
-            Text("Toggle Favorite")
+            Text(if (isFavorite) "Favorito" else "No favorito")
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Switch(
+                checked = isFavorite,
+                onCheckedChange = {
+                    scope.launch {
+
+                        val wasFavorite = isFavorite
+
+                        favoritesManager.toggleFavorite(id)
+
+                        val message = if (wasFavorite) {
+                            "Eliminado de favoritos"
+                        } else {
+                            "Guardado en favoritos"
+                        }
+
+                        notifier.showFavoriteNotification(
+                            meal!!.idMeal,
+                            meal!!.strMeal,
+                            message,
+                            meal!!.strMealThumb
+                        )
+                    }
+                }
+            )
         }
     }
 }

@@ -31,6 +31,7 @@ class NotificationHelper(private val context: Context) {
     suspend fun showFavoriteNotification(
         mealId: String,
         mealName: String,
+        message: String,      // ← nuevo
         imageUrl: String
     ) {
 
@@ -52,17 +53,17 @@ class NotificationHelper(private val context: Context) {
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(mealName)
-            .setContentText("Guardado en favoritos")
+            .setContentTitle(mealName)   // nombre del plato
+            .setContentText(message)     // ← dinámico
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
         if (bitmap != null) {
             builder
-                .setLargeIcon(bitmap) // miniatura
+                .setLargeIcon(bitmap)
                 .setStyle(
                     NotificationCompat.BigPictureStyle()
-                        .bigPicture(bitmap)       // imagen grande
+                        .bigPicture(bitmap)
                         .bigLargeIcon(null as Bitmap?)
                 )
         }
