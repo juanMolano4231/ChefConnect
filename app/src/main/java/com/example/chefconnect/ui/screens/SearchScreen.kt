@@ -40,22 +40,35 @@ fun SearchScreen(viewModel: MealViewModel, nav: NavController) {
 
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                     items(meals) { meal ->
-                        AppCard (
+                        AppCard(
                             modifier = Modifier
                                 .padding(8.dp)
+                                .fillMaxWidth()
                                 .clickable {
                                     nav.navigate(
                                         Screen.Detail.createRoute(meal.idMeal)
                                     )
                                 }
                         ) {
-                            Column {
+                            Column(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+
                                 AsyncImage(
                                     model = meal.strMealThumb,
                                     contentDescription = null,
-                                    modifier = Modifier.height(120.dp)
+                                    modifier = Modifier
+                                        .fillMaxWidth()      // ← clave
+                                        .height(140.dp)
                                 )
-                                Text(meal.strMeal)
+
+                                Text(
+                                    text = meal.strMeal,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(8.dp),
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
                             }
                         }
                     }
