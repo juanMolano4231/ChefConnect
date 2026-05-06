@@ -1,5 +1,6 @@
 package com.example.chefconnect.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.*
@@ -10,72 +11,111 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.delay
 import androidx.navigation.NavController
 import com.example.chefconnect.ui.viewmodel.*
-import androidx.compose.foundation.clickable
 import com.example.chefconnect.ui.components.AppCard
 import com.example.chefconnect.ui.navigation.Screen
 
 @Composable
-fun SearchScreen(viewModel: MealViewModel, nav: NavController) {
+fun SearchScreen(
+    viewModel: MealViewModel,
+    nav: NavController
+) {
 
     var query by remember { mutableStateOf("") }
     val state by viewModel.searchState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Debounce de búsqueda
     LaunchedEffect(query) {
+        if (query.isBlank()) return@LaunchedEffect
         delay(500)
-        if (query.isNotBlank()) viewModel.searchMeals(query)
+        viewModel.searchMeals(query)
     }
 
-    Column {
-        TextField(
-            value = query,
-            onValueChange = { query = it },
-            modifier = Modifier.fillMaxWidth(),
-            placeholder = { Text("Buscar...") }
-        )
+    // Mostrar error SOLO después de búsqueda estable
+    LaunchedEffect(state) {
+        if (state is MealState.Error && query.isNotBlank()) {
+            snackbarHostState.showSnackbar("No se encontraron resultados")
+        }
+    }
 
-        when (state) {
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
 
-            is MealState.SuccessMeals -> {
-                val meals = (state as MealState.SuccessMeals).meals
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
 
-                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                    items(meals) { meal ->
-                        AppCard(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxWidth()
-                                .clickable {
-                                    nav.navigate(
-                                        Screen.Detail.createRoute(meal.idMeal)
+            TextField(
+                value = query,
+                onValueChange = { query = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                placeholder = { Text("Buscar...") }
+            )
+
+            when (state) {
+
+                is MealState.Loading -> {
+                    Box(
+                        Modifier.fillMaxSize(),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is MealState.SuccessMeals -> {
+                    val meals = (state as MealState.SuccessMeals).meals
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        items(meals) { meal ->
+
+                            AppCard(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        nav.navigate(
+                                            Screen.Detail.createRoute(meal.idMeal)
+                                        )
+                                    }
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+
+                                    AsyncImage(
+                                        model = meal.strMealThumb,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(140.dp)
+                                    )
+
+                                    Text(
+                                        text = meal.strMeal,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 2
                                     )
                                 }
-                        ) {
-                            Column(
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-
-                                AsyncImage(
-                                    model = meal.strMealThumb,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxWidth()      // ← clave
-                                        .height(140.dp)
-                                )
-
-                                Text(
-                                    text = meal.strMeal,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(8.dp),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
                             }
                         }
                     }
                 }
-            }
 
-            else -> {}
+                else -> {}
+            }
         }
     }
 }

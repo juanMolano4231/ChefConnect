@@ -49,9 +49,15 @@ class MealViewModel(
         viewModelScope.launch {
             try {
                 val result = repository.searchMeals(query)
-                _searchState.value = MealState.SuccessMeals(result.meals ?: emptyList())
+
+                if (result.meals.isNullOrEmpty()) {
+                    _searchState.value = MealState.Error("No results")
+                } else {
+                    _searchState.value = MealState.SuccessMeals(result.meals)
+                }
+
             } catch (e: Exception) {
-                _searchState.value = MealState.Error("Search error")
+                _searchState.value = MealState.Error("Network error")
             }
         }
     }
