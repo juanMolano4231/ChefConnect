@@ -6,9 +6,9 @@ import androidx.activity.compose.setContent
 import com.example.chefconnect.data.network.RetrofitClient
 import com.example.chefconnect.data.repository.MealRepository
 import com.example.chefconnect.ui.navigation.AppNavHost
-import com.example.chefconnect.ui.theme.ChefTheme
 import com.example.chefconnect.ui.viewmodel.MealViewModel
 import com.example.chefconnect.data.local.FavoritesManager
+import com.example.chefconnect.ui.theme.ChefConnectTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
         val favoritesManager = FavoritesManager(this)
 
         setContent {
-            ChefTheme {
+            ChefConnectTheme (darkTheme = false) {
                 AppNavHost(viewModel, favoritesManager)
             }
         }

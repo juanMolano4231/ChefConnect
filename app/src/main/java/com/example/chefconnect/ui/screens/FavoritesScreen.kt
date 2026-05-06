@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
 import com.example.chefconnect.data.local.FavoritesManager
+import com.example.chefconnect.ui.components.AppCard
 import com.example.chefconnect.ui.navigation.Screen
 import com.example.chefconnect.ui.viewmodel.MealViewModel
 
@@ -54,7 +55,7 @@ fun FavoritesScreen(
 
         items(meals) { meal ->
 
-            Card(
+            AppCard (
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()

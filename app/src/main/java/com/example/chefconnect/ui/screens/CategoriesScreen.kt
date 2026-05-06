@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import androidx.navigation.NavController
+import com.example.chefconnect.ui.components.AppCard
 import com.example.chefconnect.ui.viewmodel.*
 import com.example.chefconnect.ui.navigation.Screen
 
@@ -41,7 +42,7 @@ fun CategoriesScreen(
             ) {
                 items(categories) { category ->
 
-                    Card(
+                    AppCard (
                         modifier = Modifier
                             .padding(8.dp)
                             .clickable {

@@ -11,6 +11,7 @@ import kotlinx.coroutines.delay
 import androidx.navigation.NavController
 import com.example.chefconnect.ui.viewmodel.*
 import androidx.compose.foundation.clickable
+import com.example.chefconnect.ui.components.AppCard
 import com.example.chefconnect.ui.navigation.Screen
 
 @Composable
@@ -39,7 +40,7 @@ fun SearchScreen(viewModel: MealViewModel, nav: NavController) {
 
                 LazyVerticalGrid(columns = GridCells.Fixed(2)) {
                     items(meals) { meal ->
-                        Card(
+                        AppCard (
                             modifier = Modifier
                                 .padding(8.dp)
                                 .clickable {
