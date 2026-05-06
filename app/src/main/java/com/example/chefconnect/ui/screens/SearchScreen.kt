@@ -27,22 +27,34 @@ fun SearchScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Debounce de búsqueda
+    // debounce controlado
     LaunchedEffect(query) {
-        if (query.isBlank()) return@LaunchedEffect
         delay(500)
+
+        if (query.isBlank()) return@LaunchedEffect
+
         viewModel.searchMeals(query)
     }
 
-    // Mostrar error SOLO después de búsqueda estable
+    // snackbar SOLO para error real
     LaunchedEffect(state) {
-        if (state is MealState.Error && query.isNotBlank()) {
-            snackbarHostState.showSnackbar("No se encontraron resultados")
+        when (state) {
+            is MealState.Error -> {
+                val msg = (state as MealState.Error).message
+
+                // evita spam por typing o estados intermedios
+                if (query.isNotBlank()) {
+                    snackbarHostState.showSnackbar(msg)
+                }
+            }
+            else -> Unit
         }
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        }
     ) { padding ->
 
         Column(
@@ -120,7 +132,16 @@ fun SearchScreen(
                     }
                 }
 
-                else -> {}
+                is MealState.Error -> {
+                    Box(
+                        Modifier.fillMaxSize(),
+                        contentAlignment = androidx.compose.ui.Alignment.Center
+                    ) {
+                        Text((state as MealState.Error).message)
+                    }
+                }
+
+                else -> Unit
             }
         }
     }
