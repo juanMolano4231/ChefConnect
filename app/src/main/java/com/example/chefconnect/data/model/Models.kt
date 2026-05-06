@@ -27,5 +27,6 @@ data class MealDetailResponse(
 data class MealDetail(
     val idMeal: String,
     val strMeal: String,
-    val strMealThumb: String
+    val strMealThumb: String,
+    val strInstructions: String? = null
 )

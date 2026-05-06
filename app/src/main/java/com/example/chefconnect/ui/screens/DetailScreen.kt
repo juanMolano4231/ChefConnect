@@ -1,10 +1,13 @@
 package com.example.chefconnect.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.chefconnect.data.local.FavoritesManager
@@ -25,7 +28,6 @@ fun DetailScreen(
     val context = LocalContext.current
     val notifier = remember { NotificationHelper(context) }
 
-    // observar favoritos
     val favorites by favoritesManager.favoritesFlow.collectAsState(initial = emptySet())
     val isFavorite by remember(favorites) {
         derivedStateOf { favorites.contains(id) }
@@ -36,40 +38,54 @@ fun DetailScreen(
     }
 
     if (meal == null) {
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(
+            Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
             CircularProgressIndicator()
         }
         return
     }
 
+    val data = meal!!
+
     Column(
-        Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
         AsyncImage(
-            model = meal!!.strMealThumb,
+            model = data.strMealThumb,
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(250.dp)
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         Text(
-            text = "ID: ${meal!!.idMeal}",
-            style = MaterialTheme.typography.titleMedium
+            text = data.strMeal,
+            style = MaterialTheme.typography.titleLarge,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Text(
-            text = meal!!.strMeal,
-            style = MaterialTheme.typography.titleLarge
+            text = "ID: ${data.idMeal}",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
+            verticalAlignment = Alignment.CenterVertically
         ) {
-
             Text(if (isFavorite) "Favorito" else "No favorito")
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -90,14 +106,31 @@ fun DetailScreen(
                         }
 
                         notifier.showFavoriteNotification(
-                            meal!!.idMeal,
-                            meal!!.strMeal,
+                            data.idMeal,
+                            data.strMeal,
                             message,
-                            meal!!.strMealThumb
+                            data.strMealThumb
                         )
                     }
                 }
             )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Receta",
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = data.strInstructions ?: "Sin instrucciones disponibles",
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Justify,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
