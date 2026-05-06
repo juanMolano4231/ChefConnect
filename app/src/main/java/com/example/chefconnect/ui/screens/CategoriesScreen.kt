@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.chefconnect.ui.components.AppCard
 import com.example.chefconnect.ui.viewmodel.*
 import com.example.chefconnect.ui.navigation.Screen
@@ -20,57 +21,87 @@ fun CategoriesScreen(
 ) {
 
     val state by viewModel.state.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         viewModel.loadCategories()
     }
 
-    when (state) {
-
-        is MealState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                CircularProgressIndicator()
-            }
+    LaunchedEffect(state) {
+        if (state is MealState.Error) {
+            snackbarHostState.showSnackbar(
+                message = (state as MealState.Error).message
+            )
         }
+    }
 
-        is MealState.SuccessCategories -> {
-            val categories = (state as MealState.SuccessCategories).categories
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { padding ->
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(8.dp)
-            ) {
-                items(categories) { category ->
+        Box(modifier = Modifier.padding(padding)) {
 
-                    AppCard (
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                navController.navigate(
-                                    Screen.Meals.createRoute(category.strCategory)
-                                )
-                            }
+            when (state) {
+
+                is MealState.Loading -> {
+                    Box(
+                        Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Column {
-                            AsyncImage(
-                                model = category.strCategoryThumb,
-                                contentDescription = null,
-                                modifier = Modifier.height(120.dp)
-                            )
-                            Text(
-                                text = category.strCategory,
-                                modifier = Modifier.padding(8.dp)
-                            )
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is MealState.SuccessCategories -> {
+                    val categories =
+                        (state as MealState.SuccessCategories).categories
+
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        contentPadding = PaddingValues(8.dp)
+                    ) {
+                        items(categories) { category ->
+
+                            AppCard(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            Screen.Meals.createRoute(category.strCategory)
+                                        )
+                                    }
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+
+                                    AsyncImage(
+                                        model = category.strCategoryThumb,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(120.dp)
+                                    )
+
+                                    Text(
+                                        text = category.strCategory,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
                         }
                     }
                 }
+
+                is MealState.Error -> {
+                    // UI vacío intencional: el error se muestra por Snackbar
+                }
+
+                else -> {}
             }
         }
-
-        is MealState.Error -> {
-            Text("Error")
-        }
-
-        else -> {}
     }
 }

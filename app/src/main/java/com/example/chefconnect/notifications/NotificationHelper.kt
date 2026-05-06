@@ -16,22 +16,53 @@ import com.example.chefconnect.R
 
 class NotificationHelper(private val context: Context) {
 
-    private val CHANNEL_ID = "chef_channel"
-
     init {
-        val channel = NotificationChannel(
-            CHANNEL_ID,
-            "ChefConnect",
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
+        createChannels()
+    }
+
+    private fun createChannels() {
         val manager = context.getSystemService(NotificationManager::class.java)
-        manager.createNotificationChannel(channel)
+
+        val channels = listOf(
+
+            NotificationChannel(
+                NotificationChannels.INFO,
+                "Info",
+                NotificationManager.IMPORTANCE_LOW
+            ),
+
+            NotificationChannel(
+                NotificationChannels.UPDATES,
+                "Updates",
+                NotificationManager.IMPORTANCE_LOW
+            ),
+
+            NotificationChannel(
+                NotificationChannels.SEARCH,
+                "Search",
+                NotificationManager.IMPORTANCE_LOW
+            ),
+
+            NotificationChannel(
+                NotificationChannels.FAVORITES,
+                "Favorites",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ),
+
+            NotificationChannel(
+                NotificationChannels.ERRORS,
+                "Errors",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+        )
+
+        channels.forEach { manager.createNotificationChannel(it) }
     }
 
     suspend fun showFavoriteNotification(
         mealId: String,
         mealName: String,
-        message: String,      // ← nuevo
+        message: String,
         imageUrl: String
     ) {
 
@@ -51,10 +82,13 @@ class NotificationHelper(private val context: Context) {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(
+            context,
+            NotificationChannels.FAVORITES
+        )
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle(mealName)   // nombre del plato
-            .setContentText(message)     // ← dinámico
+            .setContentTitle(mealName)
+            .setContentText(message)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
@@ -70,6 +104,22 @@ class NotificationHelper(private val context: Context) {
 
         NotificationManagerCompat.from(context)
             .notify(mealId.hashCode(), builder.build())
+    }
+
+    suspend fun showErrorNotification(message: String) {
+
+        val builder = NotificationCompat.Builder(
+            context,
+            NotificationChannels.ERRORS
+        )
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("Error")
+            .setContentText(message)
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+        NotificationManagerCompat.from(context)
+            .notify(System.currentTimeMillis().toInt(), builder.build())
     }
 
     private suspend fun loadBitmap(url: String): Bitmap? {
