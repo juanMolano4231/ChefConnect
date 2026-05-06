@@ -54,7 +54,7 @@ fun AppNavHost(
             }
 
             composable("favorites") {
-                FavoritesScreen(favoritesManager)
+                FavoritesScreen(viewModel, favoritesManager, navController)
             }
         }
     }

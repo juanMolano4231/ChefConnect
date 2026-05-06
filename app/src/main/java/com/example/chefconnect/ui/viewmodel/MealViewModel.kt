@@ -65,4 +65,7 @@ class MealViewModel(
             }
         }
     }
+
+    suspend fun getDetail(id: String) =
+        repository.getMealDetail(id)
 }
