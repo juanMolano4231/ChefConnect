@@ -27,7 +27,9 @@ fun DetailScreen(
 
     // observar favoritos
     val favorites by favoritesManager.favoritesFlow.collectAsState(initial = emptySet())
-    val isFavorite = favorites.contains(id)
+    val isFavorite by remember(favorites) {
+        derivedStateOf { favorites.contains(id) }
+    }
 
     LaunchedEffect(id) {
         viewModel.loadDetail(id)
