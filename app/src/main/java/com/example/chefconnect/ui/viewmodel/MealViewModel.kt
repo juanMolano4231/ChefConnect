@@ -21,6 +21,11 @@ class MealViewModel(
     private val _detailState = MutableStateFlow<MealDetail?>(null)
     val detailState: StateFlow<MealDetail?> = _detailState
 
+    private val _favoritesState =
+        MutableStateFlow<MealState>(MealState.Loading)
+
+    val favoritesState: StateFlow<MealState> = _favoritesState
+
     fun loadCategories() {
         viewModelScope.launch {
             _state.value = MealState.Loading
@@ -74,4 +79,27 @@ class MealViewModel(
 
     suspend fun getDetail(id: String) =
         repository.getMealDetail(id)
+
+
+
+    fun loadFavorites(ids: Set<String>) {
+        viewModelScope.launch {
+            _favoritesState.value = MealState.Loading
+
+            try {
+                val result = ids.mapNotNull { id ->
+                    repository.getMealDetail(id)
+                        .meals
+                        .firstOrNull()
+                }
+
+                _favoritesState.value =
+                    MealState.SuccessMealDetails(result)
+
+            } catch (e: Exception) {
+                _favoritesState.value =
+                    MealState.Error("Error loading favorites")
+            }
+        }
+    }
 }
